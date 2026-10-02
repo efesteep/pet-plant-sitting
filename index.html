@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pet & Plant Sitting</title>
+  <link rel="stylesheet" href="styles.css" />
+  <meta name="description" content="Find a neighbour to look after your pets and plants while you're away." />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>Pet & Plant Sitting</h1>
+      <p class="lede">Find a neighbour to feed your cat or water your plants while you're away.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel form-panel">
+      <h2>Create a sitting request</h2>
+      <form id="requestForm">
+        <div class="grid">
+          <label>Title<input name="title" required placeholder="e.g. Feed Luna & water balcony plants"></label>
+          <label>Your name<input name="owner" required placeholder="Your name"></label>
+          <label>Start date<input name="start" type="date" required></label>
+          <label>End date<input name="end" type="date" required></label>
+        </div>
+        <label>Details<textarea name="details" rows="3" placeholder="Describe pets/plants and routine"></textarea></label>
+        <label>Special instructions<textarea name="instructions" rows="2" placeholder="Where to find keys, food, notes..."></textarea></label>
+        <div class="grid">
+          <label>Reward (optional)<input name="reward" placeholder="e.g. coffee, small fee"></label>
+          <label>Contact (optional)<input name="contact" placeholder="phone or email"></label>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn primary">Create request</button>
+          <button type="button" id="clearForm" class="btn">Clear</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel list-panel">
+      <div class="list-header">
+        <h2>Active requests</h2>
+        <div class="actions">
+          <input id="search" placeholder="Search requests or owner" />
+          <button id="exportBtn" class="btn">Export</button>
+          <button id="importBtn" class="btn">Import</button>
+          <button id="clearAll" class="btn danger">Clear all</button>
+        </div>
+      </div>
+      <div id="requests"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>Data is stored locally in your browser via localStorage.</small>
+    </div>
+  </footer>
+
+  <template id="requestTemplate">
+    <article class="card">
+      <header>
+        <h3 class="title"></h3>
+        <div class="meta"></div>
+      </header>
+      <div class="body">
+        <p class="details"></p>
+        <p class="instructions"></p>
+      </div>
+      <footer class="card-footer">
+        <div class="left">
+          <small class="owner"></small>
+          <small class="dates"></small>
+        </div>
+        <div class="right">
+          <button class="btn claim">Volunteer</button>
+          <button class="btn small edit">Edit</button>
+          <button class="btn small danger delete">Delete</button>
+        </div>
+      </footer>
+      <div class="volunteers"></div>
+    </article>
+  </template>
+
+  <input id="fileInput" type="file" accept="application/json" style="display:none">
+  <script src="app.js"></script>
+</body>
+</html>

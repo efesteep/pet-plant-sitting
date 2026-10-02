@@ -1,0 +1,29 @@
+:root{--bg:#f7f7f9;--card:#fff;--accent:#2b7a78;--muted:#6b7280;--danger:#d9534f;--max-width:980px}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Helvetica,Arial,sans-serif;background:var(--bg);color:#111}
+.container{max-width:var(--max-width);margin:0 auto;padding:16px}
+.site-header{background:linear-gradient(90deg,#e6fffb,#fff);padding:28px 0;border-bottom:1px solid #eee}
+.site-header h1{margin:0;font-size:1.6rem;color:var(--accent)}
+.lede{margin:6px 0 0;color:var(--muted)}
+.panel{background:var(--card);border-radius:10px;box-shadow:0 1px 4px rgba(15,15,15,0.05);padding:16px;margin:18px 0}
+.form-panel label{display:block;margin-bottom:10px}
+.form-panel input[type=text],.form-panel input[type=date],.form-panel textarea,.form-panel input{width:100%;padding:10px;border:1px solid #e6e6f0;border-radius:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-actions{display:flex;gap:8px;margin-top:8px}
+.btn{background:transparent;border:1px solid #ddd;padding:8px 10px;border-radius:8px;cursor:pointer}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.small{padding:6px 8px;font-size:0.9rem}
+.btn.danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.list-header{display:flex;justify-content:space-between;align-items:center}
+.list-header .actions{display:flex;gap:8px;align-items:center}
+#requests{margin-top:10px;display:grid;gap:12px}
+.card{padding:12px;border-radius:8px;border:1px solid #f0f0f4}
+.card header{display:flex;justify-content:space-between;align-items:center}
+.card .meta{color:var(--muted);font-size:0.9rem}
+.card .details{margin:8px 0;color:#333}
+.card .instructions{margin:0;color:var(--muted);font-size:0.9rem}
+.card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.card-footer .owner{display:block}
+.volunteers{margin-top:8px;color:var(--muted);font-size:0.9rem}
+.site-footer{padding:14px 0;color:var(--muted);text-align:center}
+@media (max-width:720px){.grid{grid-template-columns:1fr}.list-header{flex-direction:column;align-items:stretch}.list-header .actions{justify-content:space-between}}
