@@ -1,89 +1,100 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pet & Plant Sitting</title>
-  <link rel="stylesheet" href="styles.css" />
-  <meta name="description" content="Find a neighbour to look after your pets and plants while you're away." />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pet & Plant Sitting</title>
+<meta name="description" content="Leave your pets and plants with people you trust, and stay relaxed while you're away." />
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="container">
-      <h1>Pet & Plant Sitting</h1>
-      <p class="lede">Find a neighbour to feed your cat or water your plants while you're away.</p>
-    </div>
-  </header>
+<header class="topbar">
+  <div class="wrap bar">
+    <strong class="brand">Pet & Plant Sitting</strong>
+    <nav class="nav">
+      <button data-view="home" class="on">Home</button>
+      <button data-view="circle">Circle</button>
+      <button data-view="care">Care</button>
+      <button data-view="updates">Updates</button>
+    </nav>
+  </div>
+</header>
 
-  <main class="container">
-    <section class="panel form-panel">
-      <h2>Create a sitting request</h2>
-      <form id="requestForm">
-        <div class="grid">
-          <label>Title<input name="title" required placeholder="e.g. Feed Luna & water balcony plants"></label>
-          <label>Your name<input name="owner" required placeholder="Your name"></label>
-          <label>Start date<input name="start" type="date" required></label>
-          <label>End date<input name="end" type="date" required></label>
-        </div>
-        <label>Details<textarea name="details" rows="3" placeholder="Describe pets/plants and routine"></textarea></label>
-        <label>Special instructions<textarea name="instructions" rows="2" placeholder="Where to find keys, food, notes..."></textarea></label>
-        <div class="grid">
-          <label>Reward (optional)<input name="reward" placeholder="e.g. coffee, small fee"></label>
-          <label>Contact (optional)<input name="contact" placeholder="phone or email"></label>
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn primary">Create request</button>
-          <button type="button" id="clearForm" class="btn">Clear</button>
-        </div>
-      </form>
-    </section>
+<main class="wrap">
 
-    <section class="panel list-panel">
-      <div class="list-header">
-        <h2>Active requests</h2>
-        <div class="actions">
-          <input id="search" placeholder="Search requests or owner" />
-          <button id="exportBtn" class="btn">Export</button>
-          <button id="importBtn" class="btn">Import</button>
-          <button id="clearAll" class="btn danger">Clear all</button>
-        </div>
+  <section id="home" class="view on">
+    <div class="cols cols-1-2">
+      <div class="card">
+        <h2>Going away?</h2>
+        <p class="muted">Pick someone from your trusted circle and plan the care.</p>
+        <form id="tripForm" class="stack">
+          <label>Pet or plant<select name="careId" id="tripCare" required></select></label>
+          <label>Who looks after it?<select name="personId" id="tripPerson" required></select></label>
+          <div class="row">
+            <label>From<input type="date" name="start" required></label>
+            <label>To<input type="date" name="end" required></label>
+          </div>
+          <button class="btn primary" type="submit">+ Plan a trip</button>
+        </form>
       </div>
-      <div id="requests"></div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container">
-      <small>Data is stored locally in your browser via localStorage.</small>
-    </div>
-  </footer>
-
-  <template id="requestTemplate">
-    <article class="card">
-      <header>
-        <h3 class="title"></h3>
-        <div class="meta"></div>
-      </header>
-      <div class="body">
-        <p class="details"></p>
-        <p class="instructions"></p>
+      <div>
+        <h2>Active care plans</h2>
+        <div id="plans" class="grid"></div>
       </div>
-      <footer class="card-footer">
-        <div class="left">
-          <small class="owner"></small>
-          <small class="dates"></small>
-        </div>
-        <div class="right">
-          <button class="btn claim">Volunteer</button>
-          <button class="btn small edit">Edit</button>
-          <button class="btn small danger delete">Delete</button>
-        </div>
-      </footer>
-      <div class="volunteers"></div>
-    </article>
-  </template>
+    </div>
+  </section>
 
-  <input id="fileInput" type="file" accept="application/json" style="display:none">
-  <script src="app.js"></script>
+  <section id="circle" class="view">
+    <div class="head">
+      <h2>Your trusted people</h2>
+    </div>
+    <div id="people" class="grid grid-3"></div>
+    <form id="personForm" class="card row wrap-row">
+      <label>Name<input name="name" required placeholder="Arda"></label>
+      <label>Relation<select name="relation"><option>friend</option><option>family</option><option>neighbour</option><option>colleague</option></select></label>
+      <label>Phone<input name="phone" placeholder="+49 …"></label>
+      <button class="btn primary" type="submit">+ Invite person</button>
+    </form>
+    <p class="note">No one nearby? Verified neighbours are coming later.</p>
+  </section>
+
+  <section id="care" class="view">
+    <div class="head"><h2>Care cards</h2></div>
+    <div id="cards" class="grid"></div>
+    <form id="careForm" class="card stack">
+      <h3>Add a pet or plant</h3>
+      <div class="row wrap-row">
+        <label>Name<input name="name" required placeholder="Ruby"></label>
+        <label>Type<input name="type" placeholder="dog, cat, plants…"></label>
+      </div>
+      <label>Daily tasks (one per line)<textarea name="tasks" rows="4" placeholder="Food 2x&#10;Fresh water&#10;Brush&#10;Play 10 min"></textarea></label>
+      <div class="row wrap-row">
+        <label>Vet phone<input name="vet"></label>
+        <label>Where is the key?<input name="key"></label>
+      </div>
+      <label>Important notes<input name="notes" placeholder="Keep window closed"></label>
+      <button class="btn primary" type="submit">Save care card</button>
+    </form>
+  </section>
+
+  <section id="updates" class="view">
+    <div class="cols cols-1-2">
+      <div class="card status" id="status"></div>
+      <div>
+        <h2>Today's tasks</h2>
+        <div id="todo" class="stack"></div>
+        <form id="noteForm" class="row">
+          <input name="text" placeholder="Add a short note, e.g. Ruby is sleepy today" required>
+          <button class="btn" type="submit">Send</button>
+        </form>
+        <h2>Timeline</h2>
+        <ul id="timeline" class="timeline"></ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+<footer class="wrap muted small">Data is stored locally in your browser.</footer>
+<script src="app.js"></script>
 </body>
 </html>
