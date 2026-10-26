@@ -6,13 +6,13 @@
 <title>Pet & Plant Sitting</title>
 <meta name="description" content="Leave your pets and plants with people you trust, and stay relaxed while you're away." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
 <header class="topbar">
   <div class="wrap bar">
-    <strong class="brand">Pet and plant sitting</strong>
+    <div class="brand"><span class="logo">🐾</span>Pet and plant sitting</div>
     <nav class="nav">
       <button data-view="home" class="on">Home</button>
       <button data-view="circle">Circle</button>
@@ -26,42 +26,45 @@
 
   <section id="home" class="view on">
     <div class="hero">
-      <div>
+      <div class="hero-text">
+        <span class="eyebrow">Trusted care, while you're away</span>
         <h1>Going away?</h1>
         <p>Plan who looks after your pets and plants while you are away.</p>
+        <button class="btn primary" data-toggle="tripForm">+ Plan a trip</button>
       </div>
-      <button class="btn" data-toggle="tripForm">+ Plan a trip</button>
+      <div class="hero-art" aria-hidden="true"><span>🐶</span><span>🌿</span><span>🐱</span></div>
     </div>
     <form id="tripForm" class="panel form-grid" hidden>
       <label>Pet or plant<select name="careId" id="tripCare" required></select></label>
       <label>Who looks after it?<select name="personId" id="tripPerson" required></select></label>
       <label>From<input type="date" name="start" required></label>
       <label>To<input type="date" name="end" required></label>
-      <div class="form-actions"><button class="btn" type="submit">Save plan</button><button class="btn ghost" type="button" data-toggle="tripForm">Cancel</button></div>
+      <div class="form-actions"><button class="btn primary" type="submit">Save plan</button><button class="btn ghost" type="button" data-toggle="tripForm">Cancel</button></div>
     </form>
-    <h2>Active care plans</h2>
+    <div id="stats" class="stats"></div>
+    <div class="section-head"><h2>Active care plans</h2></div>
     <div id="plans" class="grid-2"></div>
   </section>
 
   <section id="circle" class="view">
-    <div class="head">
-      <h1>Your trusted people</h1>
-      <button class="btn" data-toggle="personForm">+ Invite person</button>
+    <div class="page-head">
+      <div><h1>Your trusted people</h1><p class="sub">Only people you already know and trust can look after your home.</p></div>
+      <button class="btn primary" data-toggle="personForm">+ Invite person</button>
     </div>
     <form id="personForm" class="panel form-grid" hidden>
       <label>Name<input name="name" required placeholder="Arda"></label>
       <label>Relation<select name="relation"><option>friend</option><option>family</option><option>neighbour</option><option>colleague</option></select></label>
       <label>Phone<input name="phone" placeholder="+49 151 2345678"></label>
-      <div class="form-actions"><button class="btn" type="submit">Add person</button><button class="btn ghost" type="button" data-toggle="personForm">Cancel</button></div>
+      <div class="form-actions"><button class="btn primary" type="submit">Add person</button><button class="btn ghost" type="button" data-toggle="personForm">Cancel</button></div>
     </form>
     <div id="people" class="list"></div>
-    <div class="dashed">No one nearby? Verified neighbours (later)</div>
+    <div class="dashed"><span class="dashed-icon">🏘️</span><div><strong>No one nearby?</strong><br>Verified neighbours are coming later.</div></div>
   </section>
 
   <section id="care" class="view">
-    <div class="head">
+    <div class="page-head">
       <div id="careTabs" class="chips"></div>
-      <button class="btn" data-toggle="careForm">+ Add pet or plant</button>
+      <button class="btn primary" data-toggle="careForm">+ Add pet or plant</button>
     </div>
     <form id="careForm" class="panel form-grid" hidden>
       <label>Name<input name="name" required placeholder="Ruby"></label>
@@ -70,22 +73,22 @@
       <label>Vet phone<input name="vet"></label>
       <label>Where is the key?<input name="key"></label>
       <label class="span-2">Important note<input name="notes" placeholder="Keep window closed"></label>
-      <div class="form-actions"><button class="btn" type="submit">Save care card</button><button class="btn ghost" type="button" data-toggle="careForm">Cancel</button></div>
+      <div class="form-actions"><button class="btn primary" type="submit">Save care card</button><button class="btn ghost" type="button" data-toggle="careForm">Cancel</button></div>
     </form>
     <div id="careDetail"></div>
   </section>
 
   <section id="updates" class="view">
-    <div class="hero slim"><h2 id="status"></h2></div>
+    <div id="status" class="status-card"></div>
     <form id="noteForm" class="note-form">
       <input name="text" placeholder="Add a short update, e.g. Ruby is sleepy today" required>
-      <button class="btn" type="submit">Send update</button>
+      <button class="btn primary" type="submit">Send update</button>
     </form>
     <ul id="timeline" class="timeline"></ul>
   </section>
 
 </main>
 <footer class="wrap foot">Data is stored locally in your browser.</footer>
-<script src="app.js"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
