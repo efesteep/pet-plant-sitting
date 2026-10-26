@@ -1,116 +1,115 @@
-const STORAGE_KEY = 'pps_requests_v1'
-const form = document.getElementById('requestForm')
-const requestsEl = document.getElementById('requests')
-const template = document.getElementById('requestTemplate')
-const search = document.getElementById('search')
-const fileInput = document.getElementById('fileInput')
+const KEY = 'pps-v2';
+const seed = {
+  people: [
+    { id: 'p1', name: 'Arda', relation: 'friend', phone: '' },
+    { id: 'p2', name: 'Ata', relation: 'neighbour', phone: '' },
+    { id: 'p3', name: 'Mum', relation: 'family', phone: '' }
+  ],
+  cares: [
+    { id: 'c1', name: 'Ruby', type: 'dog', tasks: ['Food 2x', 'Fresh water', 'Brush', 'Play 10 min'], vet: '', key: 'Under the mat', notes: 'Keep window closed' },
+    { id: 'c2', name: 'Balcony plants', type: 'plants', tasks: ['Water every 2 days'], vet: '', key: 'Under the mat', notes: '' }
+  ],
+  plans: [],
+  done: {},
+  log: []
+};
 
-let requests = load()
+let s;
+try { s = JSON.parse(localStorage.getItem(KEY)) || seed; } catch (e) { s = seed; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} };
+const $ = (q) => document.querySelector(q);
+const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const id = () => Math.random().toString(36).slice(2, 9);
+const person = (pid) => s.people.find((p) => p.id === pid);
+const care = (cid) => s.cares.find((c) => c.id === cid);
+const today = () => new Date().toISOString().slice(0, 10);
+const now = () => new Date().toTimeString().slice(0, 5);
 
-function uid(){return Math.random().toString(36).slice(2,9)}
-
-function load(){
-  try{const raw = localStorage.getItem(STORAGE_KEY); return raw?JSON.parse(raw):[] }catch(e){return []}
+document.querySelectorAll('.nav button').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
+function show(v) {
+  document.querySelectorAll('.nav button').forEach((b) => b.classList.toggle('on', b.dataset.view === v));
+  document.querySelectorAll('.view').forEach((x) => x.classList.toggle('on', x.id === v));
 }
 
-function save(){localStorage.setItem(STORAGE_KEY, JSON.stringify(requests))}
+function render() {
+  $('#tripCare').innerHTML = s.cares.map((c) => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  $('#tripPerson').innerHTML = s.people.map((p) => `<option value="${p.id}">${esc(p.name)} (${esc(p.relation)})</option>`).join('');
 
-function render(filter=''){
-  requestsEl.innerHTML=''
-  const q = filter.trim().toLowerCase()
-  const list = requests.filter(r=>!q || (r.title+r.owner+r.details).toLowerCase().includes(q))
-  if(list.length===0){requestsEl.innerHTML='<p style="color:#666">No requests yet.</p>';return}
-  list.forEach(r=>{
-    const node = template.content.cloneNode(true)
-    node.querySelector('.title').textContent = r.title
-    node.querySelector('.meta').textContent = r.reward? r.reward : ''
-    node.querySelector('.details').textContent = r.details || ''
-    node.querySelector('.instructions').textContent = r.instructions? 'Notes: '+r.instructions : ''
-    node.querySelector('.owner').textContent = r.owner
-    node.querySelector('.dates').textContent = r.start + ' → ' + r.end
-    const claimBtn = node.querySelector('.claim')
-    const editBtn = node.querySelector('.edit')
-    const delBtn = node.querySelector('.delete')
-    const vol = node.querySelector('.volunteers')
-    vol.textContent = r.volunteers && r.volunteers.length? 'Volunteers: '+ r.volunteers.join(', ') : ''
+  $('#plans').innerHTML = s.plans.length
+    ? s.plans.map((pl) => `<div class="card"><h3>${esc(care(pl.careId)?.name)}</h3>
+        <p class="muted">${esc(pl.start)} – ${esc(pl.end)}<br>Looked after by ${esc(person(pl.personId)?.name)}</p>
+        <button class="btn small" data-del-plan="${pl.id}">Remove</button></div>`).join('')
+    : '<p class="muted">No trips planned yet.</p>';
 
-    claimBtn.addEventListener('click', ()=>{
-      const name = prompt('Your name to volunteer?')
-      if(!name) return
-      r.volunteers = r.volunteers||[]
-      if(!r.volunteers.includes(name)) r.volunteers.push(name)
-      save(); render(search.value)
-    })
+  $('#people').innerHTML = s.people.map((p) => `<div class="card person">
+      <div class="avatar">${esc(p.name[0] || '?')}</div>
+      <div style="flex:1"><strong>${esc(p.name)}</strong><br><span class="tag">${esc(p.relation)}</span> <span class="muted">${esc(p.phone)}</span></div>
+      <button class="btn small" data-del-person="${p.id}">×</button></div>`).join('');
 
-    editBtn.addEventListener('click', ()=>{
-      populateForm(r)
-      window.scrollTo({top:0,behavior:'smooth'})
-    })
+  $('#cards').innerHTML = s.cares.map((c) => `<div class="card stack">
+      <h3>${esc(c.name)} <span class="tag">${esc(c.type)}</span></h3>
+      <div><span class="muted">Daily checklist</span><br>${c.tasks.map((t) => '☐ ' + esc(t)).join('<br>')}</div>
+      <div class="muted">Vet: ${esc(c.vet || '–')}<br>Key: ${esc(c.key || '–')}</div>
+      ${c.notes ? `<div class="important">⚠ ${esc(c.notes)}</div>` : ''}
+      <button class="btn small" data-del-care="${c.id}">Remove</button></div>`).join('');
 
-    delBtn.addEventListener('click', ()=>{
-      if(!confirm('Delete this request?')) return
-      requests = requests.filter(x=>x.id!==r.id)
-      save(); render(search.value)
-    })
+  const d = s.done[today()] || {};
+  const items = s.cares.flatMap((c) => c.tasks.map((t) => ({ k: c.id + '|' + t, label: `${c.name}: ${t}` })));
+  $('#todo').innerHTML = items.map((it) => `<label class="check ${d[it.k] ? 'done' : ''}">
+      <input type="checkbox" data-task="${esc(it.k)}" ${d[it.k] ? 'checked' : ''}><span>${esc(it.label)}</span></label>`).join('');
 
-    requestsEl.appendChild(node)
-  })
+  const doneCount = items.filter((it) => d[it.k]).length;
+  $('#status').innerHTML = items.length && doneCount === items.length
+    ? `<div class="big">Everything is fine ✓</div><p class="muted">All ${items.length} tasks done today</p>`
+    : `<div class="big">${doneCount} / ${items.length}</div><p class="muted">tasks done today</p>`;
+
+  $('#timeline').innerHTML = s.log.slice().reverse().map((l) => `<li><time>${esc(l.date)} ${esc(l.time)}</time>${esc(l.text)}</li>`).join('') || '<li class="muted">No updates yet.</li>';
 }
 
-function populateForm(r){
-  form.title.value = r.title || ''
-  form.owner.value = r.owner || ''
-  form.start.value = r.start || ''
-  form.end.value = r.end || ''
-  form.details.value = r.details || ''
-  form.instructions.value = r.instructions || ''
-  form.reward.value = r.reward || ''
-  form.contact.value = r.contact || ''
-  form.dataset.editId = r.id
-}
+document.addEventListener('click', (e) => {
+  const t = e.target.dataset;
+  if (t.delPlan) s.plans = s.plans.filter((x) => x.id !== t.delPlan);
+  else if (t.delPerson) s.people = s.people.filter((x) => x.id !== t.delPerson);
+  else if (t.delCare) s.cares = s.cares.filter((x) => x.id !== t.delCare);
+  else return;
+  save(); render();
+});
 
-form.addEventListener('submit', e=>{
-  e.preventDefault()
-  const data = Object.fromEntries(new FormData(form).entries())
-  const id = form.dataset.editId
-  if(id){
-    const idx = requests.findIndex(r=>r.id===id)
-    if(idx>-1){requests[idx] = {...requests[idx], ...data}; delete form.dataset.editId }
-  }else{
-    const r = {...data, id:uid(), volunteers:[]}
-    requests.unshift(r)
-  }
-  form.reset(); save(); render(search.value)
-})
+document.addEventListener('change', (e) => {
+  const k = e.target.dataset.task;
+  if (!k) return;
+  const d = (s.done[today()] = s.done[today()] || {});
+  d[k] = e.target.checked;
+  if (e.target.checked) s.log.push({ date: today(), time: now(), text: k.split('|')[1] + ' ✓ (' + (care(k.split('|')[0])?.name || '') + ')' });
+  save(); render();
+});
 
-document.getElementById('clearForm').addEventListener('click', ()=>{form.reset(); delete form.dataset.editId})
-search.addEventListener('input', e=>render(e.target.value))
+$('#tripForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  if (f.end < f.start) { alert('End date must be after start date.'); return; }
+  s.plans.push({ id: id(), ...f });
+  save(); render(); e.target.reset();
+});
 
-document.getElementById('clearAll').addEventListener('click', ()=>{
-  if(confirm('Clear all requests?')){ requests=[]; save(); render() }
-})
+$('#personForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  s.people.push({ id: id(), ...Object.fromEntries(new FormData(e.target)) });
+  save(); render(); e.target.reset();
+});
 
-document.getElementById('exportBtn').addEventListener('click', ()=>{
-  const blob = new Blob([JSON.stringify(requests, null, 2)],{type:'application/json'})
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a'); a.href=url; a.download='pps-requests.json'; a.click(); URL.revokeObjectURL(url)
-})
+$('#careForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  f.tasks = (f.tasks || '').split('\n').map((x) => x.trim()).filter(Boolean);
+  s.cares.push({ id: id(), ...f });
+  save(); render(); e.target.reset();
+});
 
-document.getElementById('importBtn').addEventListener('click', ()=>fileInput.click())
-fileInput.addEventListener('change', ()=>{
-  const f = fileInput.files[0]; if(!f) return
-  const reader = new FileReader(); reader.onload = ()=>{
-    try{const imported = JSON.parse(reader.result); if(Array.isArray(imported)){ requests = imported.concat(requests); save(); render() }else alert('Invalid file') }catch(e){alert('Invalid JSON')}
-    fileInput.value = ''
-  }
-  reader.readAsText(f)
-})
+$('#noteForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  s.log.push({ date: today(), time: now(), text: e.target.text.value });
+  save(); render(); e.target.reset();
+});
 
-if(requests.length===0){
-  requests = [
-    {id:uid(), title:'Feed Milo & water succulents', owner:'Aisha', start:'2026-11-02', end:'2026-11-09', details:'Feed twice daily, wet food in small tins. Water succulents once on day 3.', instructions:'Keys with neighbour', reward:'Coffee + thanks', contact:'', volunteers:[]}
-  ]
-  save()
-}
-
-render()
+render();
